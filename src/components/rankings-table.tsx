@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 
 import {
-  defaultSelectedCategories,
   priceTiers,
   restaurantCategories,
 } from "@/data/restaurants";
@@ -82,7 +81,7 @@ export function RankingsTable() {
               <span className="eyebrow">Categories</span>
               <p className="filter-note">
                 {filters.categories.length === 0
-                  ? "Default view: restaurant categories only"
+                  ? "Default view: sit-down restaurants only"
                   : `${filters.categories.length} categories selected`}
               </p>
             </div>

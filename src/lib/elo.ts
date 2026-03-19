@@ -19,6 +19,14 @@ export type RankedRestaurant = Restaurant & {
 const BASE_ELO = 1500;
 const K_FACTOR = 28;
 
+function normalizeRestaurantName(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "")
+    .toLowerCase();
+}
+
 function expectedScore(playerRating: number, opponentRating: number) {
   return 1 / (1 + 10 ** ((opponentRating - playerRating) / 400));
 }
@@ -135,12 +143,12 @@ export function chooseVotePair(
   const first = sorted[startIndex];
   const second = sorted
     .slice(startIndex + 1)
+    .filter((candidate) => normalizeRestaurantName(candidate.name) !== normalizeRestaurantName(first.name))
     .sort((a, b) => {
       const aElo = rankedMap.get(a.id)?.elo ?? BASE_ELO;
       const bElo = rankedMap.get(b.id)?.elo ?? BASE_ELO;
       return Math.abs(aElo - (rankedMap.get(first.id)?.elo ?? BASE_ELO)) -
         Math.abs(bElo - (rankedMap.get(first.id)?.elo ?? BASE_ELO));
     })[0];
-
   return second ? [first, second] : null;
 }

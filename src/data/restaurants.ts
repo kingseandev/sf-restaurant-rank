@@ -81,4 +81,10 @@ export const defaultSelectedCategories: RestaurantCategory[] = [
   "Pizza",
 ];
 
+export const defaultRestaurantTypes: RestaurantType[] = [
+  "Sit-Down",
+  "Fine Dining",
+  "Bar & Small Plates",
+];
+
 export const restaurants = rawRestaurants as Restaurant[];

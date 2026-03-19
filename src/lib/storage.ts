@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  defaultSelectedCategories,
+  defaultRestaurantTypes,
   restaurants,
   type PriceTier,
   type RestaurantCategory,
   type Restaurant,
+  type RestaurantType,
 } from "@/data/restaurants";
 import { computeRankings, type VoteRecord } from "@/lib/elo";
 
@@ -17,6 +18,14 @@ export type Filters = {
   locationQuery: string;
   radiusMiles: number;
 };
+
+function effectiveTypes(filters: Filters): RestaurantType[] | null {
+  if (filters.categories.length === 0) {
+    return defaultRestaurantTypes;
+  }
+
+  return null;
+}
 
 type StoredState = {
   votes: VoteRecord[];
@@ -208,12 +217,13 @@ function milesBetween(
 
 export function filterRestaurants(filters: Filters): Restaurant[] {
   const center = resolveLocationCenter(filters.locationQuery);
-  const effectiveCategories =
-    filters.categories.length === 0 ? defaultSelectedCategories : filters.categories;
+  const implicitTypes = effectiveTypes(filters);
 
   return restaurants.filter((restaurant) => {
     const categoryMatches =
-      effectiveCategories.includes(restaurant.category);
+      filters.categories.length === 0 || filters.categories.includes(restaurant.category);
+    const typeMatches =
+      implicitTypes === null || implicitTypes.includes(restaurant.type);
     const priceMatches =
       filters.priceTier === "All" || restaurant.priceTier === filters.priceTier;
     const locationMatches =
@@ -221,7 +231,7 @@ export function filterRestaurants(filters: Filters): Restaurant[] {
       (center !== null &&
         milesBetween(center, restaurant.coordinates) <= filters.radiusMiles);
 
-    return categoryMatches && priceMatches && locationMatches;
+    return categoryMatches && typeMatches && priceMatches && locationMatches;
   });
 }
 
