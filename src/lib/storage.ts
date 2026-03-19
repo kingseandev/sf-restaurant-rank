@@ -8,7 +8,7 @@ import {
 } from "@/data/restaurants";
 import { computeRankings, type VoteRecord } from "@/lib/elo";
 
-const STORAGE_KEY = "sf-restaurant-rank-v1";
+const STORAGE_KEY = "sf-restaurant-rank-v2";
 
 export type Filters = {
   type: RestaurantType | "All";
@@ -21,32 +21,63 @@ type StoredState = {
   votes: VoteRecord[];
 };
 
+const seededNameVotes = [
+  ["Zuni Cafe", "Tartine Manufactory"],
+  ["House of Prime Rib", "Liholiho Yacht Club"],
+  ["La Taqueria", "Senor Sisig"],
+  ["Nopa", "Souvla"],
+  ["The Progress", "Foreign Cinema"],
+  ["Rintaro", "Swan Oyster Depot"],
+  ["La Taqueria", "Souvla"],
+  ["Foreign Cinema", "Tartine Manufactory"],
+  ["Liholiho Yacht Club", "The Progress"],
+  ["Senor Sisig", "Swan Oyster Depot"],
+  ["Nopa", "House of Prime Rib"],
+  ["Zuni Cafe", "Foreign Cinema"],
+  ["Rintaro", "Liholiho Yacht Club"],
+  ["The Progress", "House of Prime Rib"],
+  ["Souvla", "Tartine Manufactory"],
+  ["La Taqueria", "Senor Sisig"],
+  ["Nopa", "Zuni Cafe"],
+] as const;
+
 function daysAgo(days: number) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 }
 
-const seedVotes: VoteRecord[] = [
-  { winnerId: "zuni-cafe", loserId: "tartine-manufactory", createdAt: daysAgo(12) },
-  { winnerId: "house-of-prime-rib", loserId: "liholiho-yonkers", createdAt: daysAgo(11) },
-  { winnerId: "la-taqueria", loserId: "senor-sisig-valencia", createdAt: daysAgo(10) },
-  { winnerId: "nopa", loserId: "souvla-hayes", createdAt: daysAgo(9) },
-  { winnerId: "the-progress", loserId: "foreign-cinema", createdAt: daysAgo(8) },
-  { winnerId: "rintaro-mission", loserId: "swan-oyster-depot", createdAt: daysAgo(8) },
-  { winnerId: "la-taqueria", loserId: "souvla-hayes", createdAt: daysAgo(7) },
-  { winnerId: "foreign-cinema", loserId: "tartine-manufactory", createdAt: daysAgo(6) },
-  { winnerId: "liholiho-yonkers", loserId: "the-progress", createdAt: daysAgo(6) },
-  { winnerId: "senor-sisig-valencia", loserId: "swan-oyster-depot", createdAt: daysAgo(5) },
-  { winnerId: "nopa", loserId: "house-of-prime-rib", createdAt: daysAgo(4) },
-  { winnerId: "zuni-cafe", loserId: "foreign-cinema", createdAt: daysAgo(4) },
-  { winnerId: "rintaro-mission", loserId: "liholiho-yonkers", createdAt: daysAgo(3) },
-  { winnerId: "the-progress", loserId: "house-of-prime-rib", createdAt: daysAgo(2) },
-  { winnerId: "souvla-hayes", loserId: "tartine-manufactory", createdAt: daysAgo(2) },
-  { winnerId: "la-taqueria", loserId: "senor-sisig-valencia", createdAt: daysAgo(1) },
-  { winnerId: "nopa", loserId: "zuni-cafe", createdAt: daysAgo(1) },
-];
+function normalizeName(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "")
+    .toLowerCase();
+}
+
+function createSeedVotes(): VoteRecord[] {
+  const byName = new Map(
+    restaurants.map((restaurant) => [normalizeName(restaurant.name), restaurant.id]),
+  );
+
+  return seededNameVotes.flatMap(([winnerName, loserName], index) => {
+    const winnerId = byName.get(normalizeName(winnerName));
+    const loserId = byName.get(normalizeName(loserName));
+
+    if (!winnerId || !loserId) {
+      return [];
+    }
+
+    return [
+      {
+        winnerId,
+        loserId,
+        createdAt: daysAgo(12 - Math.min(index, 11)),
+      },
+    ];
+  });
+}
 
 function getSeedState(): StoredState {
-  return { votes: seedVotes };
+  return { votes: createSeedVotes() };
 }
 
 export function loadState(): StoredState {
@@ -93,10 +124,31 @@ function extractZip(query: string) {
 const locationCenters: Record<string, { lat: number; lng: number }> = {
   "94102": { lat: 37.7799, lng: -122.4194 },
   "94103": { lat: 37.7725, lng: -122.4091 },
+  "94104": { lat: 37.7915, lng: -122.4021 },
+  "94105": { lat: 37.7898, lng: -122.3942 },
+  "94107": { lat: 37.7669, lng: -122.3959 },
+  "94108": { lat: 37.7925, lng: -122.4083 },
   "94109": { lat: 37.7927, lng: -122.4212 },
   "94110": { lat: 37.7487, lng: -122.4158 },
+  "94111": { lat: 37.7993, lng: -122.3981 },
   "94115": { lat: 37.7851, lng: -122.4374 },
+  "94114": { lat: 37.7594, lng: -122.4349 },
   "94117": { lat: 37.7709, lng: -122.4440 },
+  "94118": { lat: 37.7817, lng: -122.4618 },
+  "94121": { lat: 37.7794, lng: -122.4949 },
+  "94122": { lat: 37.7596, lng: -122.4866 },
+  "94123": { lat: 37.8009, lng: -122.4382 },
+  "94124": { lat: 37.7316, lng: -122.3825 },
+  "94127": { lat: 37.7352, lng: -122.4586 },
+  "94129": { lat: 37.7999, lng: -122.4645 },
+  "94130": { lat: 37.8210, lng: -122.3712 },
+  "94131": { lat: 37.7459, lng: -122.4408 },
+  "94132": { lat: 37.7216, lng: -122.4848 },
+  "94133": { lat: 37.8032, lng: -122.4107 },
+  "94134": { lat: 37.7198, lng: -122.4100 },
+  "94137": { lat: 37.7715, lng: -122.3870 },
+  "94143": { lat: 37.7631, lng: -122.4586 },
+  "94158": { lat: 37.7707, lng: -122.3871 },
   "hayes valley": { lat: 37.7764, lng: -122.4241 },
   "mission": { lat: 37.7599, lng: -122.4148 },
   "nopa": { lat: 37.7749, lng: -122.4375 },
@@ -104,6 +156,24 @@ const locationCenters: Record<string, { lat: number; lng: number }> = {
   "fillmore": { lat: 37.7837, lng: -122.4328 },
   "polk gulch": { lat: 37.7908, lng: -122.4209 },
   "russian hill": { lat: 37.8004, lng: -122.4192 },
+  "soma": { lat: 37.7786, lng: -122.4057 },
+  "downtown": { lat: 37.7898, lng: -122.4008 },
+  "rincon hill": { lat: 37.7860, lng: -122.3927 },
+  "mission bay": { lat: 37.7706, lng: -122.3910 },
+  "chinatown": { lat: 37.7941, lng: -122.4078 },
+  "embarcadero": { lat: 37.7955, lng: -122.3937 },
+  "castro": { lat: 37.7609, lng: -122.4350 },
+  "inner richmond": { lat: 37.7809, lng: -122.4784 },
+  "outer richmond": { lat: 37.7799, lng: -122.4892 },
+  "sunset": { lat: 37.7544, lng: -122.4901 },
+  "outer sunset": { lat: 37.7534, lng: -122.4942 },
+  "marina": { lat: 37.8037, lng: -122.4368 },
+  "bayview": { lat: 37.7295, lng: -122.3929 },
+  "presidio": { lat: 37.7989, lng: -122.4662 },
+  "noe valley": { lat: 37.7502, lng: -122.4337 },
+  "lake merced": { lat: 37.7282, lng: -122.4930 },
+  "north beach": { lat: 37.8061, lng: -122.4103 },
+  "visitacion valley": { lat: 37.7158, lng: -122.4051 },
 };
 
 function resolveLocationCenter(query: string) {

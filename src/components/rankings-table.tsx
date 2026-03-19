@@ -35,6 +35,14 @@ export function RankingsTable() {
     () => rankings.filter((restaurant) => filteredIds.has(restaurant.id)),
     [filteredIds, rankings],
   );
+  const [page, setPage] = useState(1);
+  const pageSize = 100;
+  const totalPages = Math.max(1, Math.ceil(visibleRankings.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRankings = useMemo(
+    () => visibleRankings.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [currentPage, visibleRankings],
+  );
 
   return (
     <div className="stack-lg">
@@ -130,7 +138,7 @@ export function RankingsTable() {
             <span>Votes</span>
           </div>
 
-          {visibleRankings.map((restaurant) => (
+          {pagedRankings.map((restaurant) => (
             <article className="rankings-row" key={restaurant.id}>
               <span className="rank-pill">#{restaurant.rank}</span>
               <div>
@@ -152,7 +160,35 @@ export function RankingsTable() {
               <h2>No restaurants match that filter combination.</h2>
               <p>Try a wider radius, another price band, or a different ZIP code or neighborhood.</p>
             </div>
-          ) : null}
+          ) : (
+            <div className="pagination-bar">
+              <p>
+                Showing {Math.min((currentPage - 1) * pageSize + 1, visibleRankings.length)}-
+                {Math.min(currentPage * pageSize, visibleRankings.length)} of {visibleRankings.length}
+              </p>
+              <div className="pagination-actions">
+                <button
+                  className="skip-button"
+                  disabled={currentPage === 1}
+                  onClick={() => setPage((value) => Math.max(1, value - 1))}
+                  type="button"
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} / {totalPages}
+                </span>
+                <button
+                  className="skip-button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+                  type="button"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
