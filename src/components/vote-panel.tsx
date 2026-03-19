@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import {
+  defaultSelectedCategories,
   priceTiers,
   restaurantCategories,
   type Restaurant,
@@ -34,7 +35,7 @@ function VoteCard({
 
 export function VotePanel() {
   const [filters, setFilters] = useState<Filters>({
-    categories: [],
+    categories: defaultSelectedCategories,
     priceTier: "All",
     locationQuery: "",
     radiusMiles: 3,
@@ -43,7 +44,7 @@ export function VotePanel() {
   const [pair, setPair] = useState<[Restaurant, Restaurant] | null>(() =>
     chooseVotePair(
       filterRestaurants({
-        categories: [],
+        categories: defaultSelectedCategories,
         priceTier: "All",
         locationQuery: "",
         radiusMiles: 3,
@@ -94,10 +95,12 @@ export function VotePanel() {
             <span className="eyebrow">Categories</span>
             <button
               className="filter-subtle"
-              onClick={() => updateFilters({ ...filters, categories: [] })}
+              onClick={() =>
+                updateFilters({ ...filters, categories: defaultSelectedCategories })
+              }
               type="button"
             >
-              Clear
+              Reset
             </button>
           </div>
           <div className="chip-row">
@@ -114,14 +117,7 @@ export function VotePanel() {
           </div>
         </div>
 
-        <section className="filter-bar">
-        <label>
-          Categories
-          <div className="filter-value">
-            {filters.categories.length === 0 ? "All categories" : `${filters.categories.length} selected`}
-          </div>
-        </label>
-
+        <section className="filter-bar filter-bar-compact">
         <label>
           Price
           <select
@@ -187,7 +183,7 @@ export function VotePanel() {
       ) : (
         <section className="empty-state">
           <h2>Not enough restaurants match those filters.</h2>
-          <p>Try a wider radius, another price band, or a different ZIP code or neighborhood.</p>
+          <p>Try a wider radius, different categories, or another location.</p>
         </section>
       )}
     </div>

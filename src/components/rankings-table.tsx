@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import { priceTiers, restaurantCategories } from "@/data/restaurants";
+import {
+  defaultSelectedCategories,
+  priceTiers,
+  restaurantCategories,
+} from "@/data/restaurants";
 import { filterRestaurants, loadRankings, type Filters } from "@/lib/storage";
 
 function trendLabel(trend: number) {
@@ -19,7 +23,7 @@ function trendLabel(trend: number) {
 
 export function RankingsTable() {
   const [filters, setFilters] = useState<Filters>({
-    categories: [],
+    categories: defaultSelectedCategories,
     priceTier: "All",
     locationQuery: "",
     radiusMiles: 3,
@@ -72,10 +76,12 @@ export function RankingsTable() {
             <span className="eyebrow">Categories</span>
             <button
               className="filter-subtle"
-              onClick={() => updateFilters({ ...filters, categories: [] })}
+              onClick={() =>
+                updateFilters({ ...filters, categories: defaultSelectedCategories })
+              }
               type="button"
             >
-              Clear
+              Reset
             </button>
           </div>
           <div className="chip-row">
@@ -92,14 +98,7 @@ export function RankingsTable() {
           </div>
         </div>
 
-        <section className="filter-bar">
-        <label>
-          Categories
-          <div className="filter-value">
-            {filters.categories.length === 0 ? "All categories" : `${filters.categories.length} selected`}
-          </div>
-        </label>
-
+        <section className="filter-bar filter-bar-compact">
         <label>
           Price
           <select
@@ -181,7 +180,7 @@ export function RankingsTable() {
           {visibleRankings.length === 0 ? (
             <div className="empty-state inline">
               <h2>No restaurants match that filter combination.</h2>
-              <p>Try a wider radius, another price band, or a different ZIP code or neighborhood.</p>
+              <p>Try a wider radius, different categories, or another location.</p>
             </div>
           ) : (
             <div className="pagination-bar">

@@ -68,4 +68,17 @@ export const restaurantCategories: RestaurantCategory[] = [
   "Other Eats",
 ];
 
+export const defaultSelectedCategories: RestaurantCategory[] = [
+  "Asian",
+  "American",
+  "Mexican & Latin",
+  "Mediterranean",
+  "Seafood",
+  "Fine Dining",
+  "Italian",
+  "Other Eats",
+  "Breakfast & Brunch",
+  "Pizza",
+];
+
 export const restaurants = rawRestaurants as Restaurant[];
