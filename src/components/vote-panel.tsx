@@ -93,7 +93,7 @@ export function VotePanel() {
     : Array.from(new Set([...restaurantCategories.slice(0, 6), ...filters.categories]));
 
   return (
-    <div className="stack-lg">
+    <div className="stack-lg vote-layout">
       <section className="filter-shell">
         <div className="filter-strip">
           <div className="filter-strip-head">

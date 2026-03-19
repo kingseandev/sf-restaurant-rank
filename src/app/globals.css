@@ -606,4 +606,13 @@ select {
   .rankings-row {
     gap: 10px;
   }
+
+  .vote-layout .vote-grid,
+  .vote-layout .empty-state {
+    order: 1;
+  }
+
+  .vote-layout .filter-shell {
+    order: 2;
+  }
 }
