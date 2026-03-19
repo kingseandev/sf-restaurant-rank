@@ -3,15 +3,15 @@
 import {
   restaurants,
   type PriceTier,
+  type RestaurantCategory,
   type Restaurant,
-  type RestaurantType,
 } from "@/data/restaurants";
 import { computeRankings, type VoteRecord } from "@/lib/elo";
 
 const STORAGE_KEY = "sf-restaurant-rank-v2";
 
 export type Filters = {
-  type: RestaurantType | "All";
+  categories: RestaurantCategory[];
   priceTier: PriceTier | "All";
   locationQuery: string;
   radiusMiles: number;
@@ -209,7 +209,8 @@ export function filterRestaurants(filters: Filters): Restaurant[] {
   const center = resolveLocationCenter(filters.locationQuery);
 
   return restaurants.filter((restaurant) => {
-    const typeMatches = filters.type === "All" || restaurant.type === filters.type;
+    const categoryMatches =
+      filters.categories.length === 0 || filters.categories.includes(restaurant.category);
     const priceMatches =
       filters.priceTier === "All" || restaurant.priceTier === filters.priceTier;
     const locationMatches =
@@ -217,7 +218,7 @@ export function filterRestaurants(filters: Filters): Restaurant[] {
       (center !== null &&
         milesBetween(center, restaurant.coordinates) <= filters.radiusMiles);
 
-    return typeMatches && priceMatches && locationMatches;
+    return categoryMatches && priceMatches && locationMatches;
   });
 }
 

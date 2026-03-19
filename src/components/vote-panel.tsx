@@ -4,9 +4,8 @@ import { useState } from "react";
 
 import {
   priceTiers,
-  restaurantTypes,
+  restaurantCategories,
   type Restaurant,
-  type RestaurantType,
 } from "@/data/restaurants";
 import { chooseVotePair, type RankedRestaurant } from "@/lib/elo";
 import { filterRestaurants, loadRankings, saveVote, type Filters } from "@/lib/storage";
@@ -20,10 +19,11 @@ function VoteCard({
 }) {
   return (
     <button className="vote-card" onClick={() => onSelect(restaurant.id)} type="button">
-      <span className="eyebrow">{restaurant.type}</span>
+      <span className="eyebrow">{restaurant.category}</span>
       <h3>{restaurant.name}</h3>
       <p>{restaurant.tagline}</p>
       <div className="vote-meta">
+        <span>{restaurant.type}</span>
         <span>{restaurant.neighborhood}</span>
         <span>{restaurant.zipCode}</span>
         <span>{restaurant.priceTier}</span>
@@ -34,7 +34,7 @@ function VoteCard({
 
 export function VotePanel() {
   const [filters, setFilters] = useState<Filters>({
-    type: "All",
+    categories: [],
     priceTier: "All",
     locationQuery: "",
     radiusMiles: 3,
@@ -43,7 +43,7 @@ export function VotePanel() {
   const [pair, setPair] = useState<[Restaurant, Restaurant] | null>(() =>
     chooseVotePair(
       filterRestaurants({
-        type: "All",
+        categories: [],
         priceTier: "All",
         locationQuery: "",
         radiusMiles: 3,
@@ -78,27 +78,48 @@ export function VotePanel() {
     refreshPair(rankings);
   }
 
+  function toggleCategory(category: Filters["categories"][number]) {
+    const nextCategories = filters.categories.includes(category)
+      ? filters.categories.filter((value) => value !== category)
+      : [...filters.categories, category];
+
+    updateFilters({ ...filters, categories: nextCategories });
+  }
+
   return (
     <div className="stack-lg">
-      <section className="filter-bar">
-        <label>
-          Restaurant type
-          <select
-            value={filters.type}
-            onChange={(event) =>
-              updateFilters({
-                ...filters,
-                type: event.target.value as RestaurantType | "All",
-              })
-            }
-          >
-            <option value="All">All</option>
-            {restaurantTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
+      <section className="filter-shell">
+        <div className="filter-strip">
+          <div className="filter-strip-head">
+            <span className="eyebrow">Categories</span>
+            <button
+              className="filter-subtle"
+              onClick={() => updateFilters({ ...filters, categories: [] })}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="chip-row">
+            {restaurantCategories.map((category) => (
+              <button
+                key={category}
+                className={filters.categories.includes(category) ? "filter-chip active" : "filter-chip"}
+                onClick={() => toggleCategory(category)}
+                type="button"
+              >
+                {category}
+              </button>
             ))}
-          </select>
+          </div>
+        </div>
+
+        <section className="filter-bar">
+        <label>
+          Categories
+          <div className="filter-value">
+            {filters.categories.length === 0 ? "All categories" : `${filters.categories.length} selected`}
+          </div>
         </label>
 
         <label>
@@ -149,6 +170,7 @@ export function VotePanel() {
             }
           />
         </label>
+        </section>
       </section>
 
       {pair ? (

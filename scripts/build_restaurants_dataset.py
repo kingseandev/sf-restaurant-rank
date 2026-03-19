@@ -132,6 +132,89 @@ FAST_CASUAL_CATEGORIES = {
     "burrito_restaurant",
 }
 
+ASIAN_MARKERS = {
+    "chinese_restaurant",
+    "japanese_restaurant",
+    "sushi_restaurant",
+    "thai_restaurant",
+    "vietnamese_restaurant",
+    "korean_restaurant",
+    "ramen_restaurant",
+    "noodle_restaurant",
+    "asian_restaurant",
+    "dim_sum_restaurant",
+    "indian_restaurant",
+}
+
+LATIN_MARKERS = {
+    "mexican_restaurant",
+    "latin_american_restaurant",
+    "taqueria",
+    "taco_restaurant",
+    "burrito_restaurant",
+}
+
+MEDITERRANEAN_MARKERS = {
+    "mediterranean_restaurant",
+    "middle_eastern_restaurant",
+    "greek_restaurant",
+    "turkish_restaurant",
+}
+
+AMERICAN_MARKERS = {
+    "american_restaurant",
+    "new_american_restaurant",
+    "burger_restaurant",
+    "steakhouse",
+    "barbecue_restaurant",
+    "southern_restaurant",
+    "sandwich_shop",
+}
+
+SEAFOOD_MARKERS = {
+    "seafood_restaurant",
+    "oyster_bar",
+}
+
+BREAKFAST_MARKERS = {
+    "breakfast_restaurant",
+    "breakfast_and_brunch_restaurant",
+    "brunch_restaurant",
+}
+
+PIZZA_MARKERS = {
+    "pizza_restaurant",
+    "pizzeria",
+    "pizzaria",
+}
+
+DESSERT_MARKERS = {
+    "bakery",
+    "dessert_shop",
+    "ice_cream_shop",
+    "bubble_tea_shop",
+}
+
+CAFE_MARKERS = {
+    "coffee_shop",
+    "cafe",
+    "tea_house",
+    "juice_bar",
+}
+
+BAR_MARKERS = {
+    "bar",
+    "cocktail_bar",
+    "wine_bar",
+    "pub",
+    "bar_and_grill",
+}
+
+FAST_MARKERS = {
+    "fast_food_restaurant",
+    "food_truck",
+}
+
 
 def normalize_text(value: str) -> str:
     return unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
@@ -176,6 +259,39 @@ def inferred_price_tier(category: str, restaurant_type: str) -> str:
     return "$$$"
 
 
+def inferred_category(category: str, basic_category: str, hierarchy: list[str], restaurant_type: str) -> str:
+    tokens = {token for token in [category, basic_category, *hierarchy] if token}
+
+    if tokens & CAFE_MARKERS:
+        return "Coffee & Tea"
+    if tokens & DESSERT_MARKERS:
+        return "Bakery & Desserts"
+    if tokens & BAR_MARKERS:
+        return "Bars & Drinks"
+    if tokens & BREAKFAST_MARKERS:
+        return "Breakfast & Brunch"
+    if tokens & FAST_MARKERS:
+        return "Fast Food"
+    if tokens & PIZZA_MARKERS:
+        return "Pizza"
+    if tokens & LATIN_MARKERS:
+        return "Mexican & Latin"
+    if tokens & ASIAN_MARKERS:
+        return "Asian"
+    if tokens & MEDITERRANEAN_MARKERS:
+        return "Mediterranean"
+    if tokens & SEAFOOD_MARKERS:
+        return "Seafood"
+    if restaurant_type == "Fine Dining":
+        return "Fine Dining"
+    if tokens & AMERICAN_MARKERS:
+        return "American"
+    if "italian_restaurant" in tokens:
+        return "Italian"
+
+    return "Other Eats"
+
+
 def is_restaurant_like(category: str, basic_category: str, hierarchy: list[str]) -> bool:
     tokens = {token for token in [category, basic_category, *hierarchy] if token}
     if "restaurant" in tokens or any(token.endswith("_restaurant") for token in tokens):
@@ -187,6 +303,7 @@ def is_restaurant_like(category: str, basic_category: str, hierarchy: list[str])
 class Candidate:
     id: str
     name: str
+    category: str
     type: str
     neighborhood: str
     zip_code: str
@@ -246,6 +363,7 @@ def main() -> None:
             continue
 
         restaurant_type = inferred_type(category, basic_category)
+        display_category = inferred_category(category, basic_category, hierarchy, restaurant_type)
         price_tier = inferred_price_tier(category or basic_category, restaurant_type)
         neighborhood = ZIP_TO_AREA.get(postcode, "San Francisco")
         category_label = prettify_category(category or basic_category or "restaurant")
@@ -255,6 +373,7 @@ def main() -> None:
         candidate = Candidate(
             id=str(row["id"]),
             name=name,
+            category=display_category,
             type=restaurant_type,
             neighborhood=neighborhood,
             zip_code=postcode,
@@ -274,6 +393,7 @@ def main() -> None:
         {
             "id": candidate.id,
             "name": candidate.name,
+            "category": candidate.category,
             "type": candidate.type,
             "neighborhood": candidate.neighborhood,
             "zipCode": candidate.zip_code,

@@ -1,5 +1,21 @@
 import rawRestaurants from "@/data/restaurants.generated.json";
 
+export type RestaurantCategory =
+  | "Coffee & Tea"
+  | "Bakery & Desserts"
+  | "Bars & Drinks"
+  | "Breakfast & Brunch"
+  | "Fast Food"
+  | "Pizza"
+  | "Mexican & Latin"
+  | "Asian"
+  | "Mediterranean"
+  | "Seafood"
+  | "Fine Dining"
+  | "American"
+  | "Italian"
+  | "Other Eats";
+
 export type RestaurantType =
   | "Quick Service"
   | "Fast Casual"
@@ -13,6 +29,7 @@ export type PriceTier = "$" | "$$" | "$$$" | "$$$$";
 export type Restaurant = {
   id: string;
   name: string;
+  category: RestaurantCategory;
   type: RestaurantType;
   neighborhood: string;
   zipCode: string;
@@ -34,5 +51,21 @@ export const restaurantTypes: RestaurantType[] = [
 ];
 
 export const priceTiers: PriceTier[] = ["$", "$$", "$$$", "$$$$"];
+export const restaurantCategories: RestaurantCategory[] = [
+  "Coffee & Tea",
+  "Bakery & Desserts",
+  "Bars & Drinks",
+  "Breakfast & Brunch",
+  "Fast Food",
+  "Pizza",
+  "Mexican & Latin",
+  "Asian",
+  "Mediterranean",
+  "Seafood",
+  "Fine Dining",
+  "American",
+  "Italian",
+  "Other Eats",
+];
 
 export const restaurants = rawRestaurants as Restaurant[];

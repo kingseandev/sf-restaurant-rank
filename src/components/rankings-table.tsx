@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { priceTiers, restaurantTypes, type RestaurantType } from "@/data/restaurants";
+import { priceTiers, restaurantCategories } from "@/data/restaurants";
 import { filterRestaurants, loadRankings, type Filters } from "@/lib/storage";
 
 function trendLabel(trend: number) {
@@ -19,7 +19,7 @@ function trendLabel(trend: number) {
 
 export function RankingsTable() {
   const [filters, setFilters] = useState<Filters>({
-    type: "All",
+    categories: [],
     priceTier: "All",
     locationQuery: "",
     radiusMiles: 3,
@@ -44,6 +44,19 @@ export function RankingsTable() {
     [currentPage, visibleRankings],
   );
 
+  function updateFilters(nextFilters: Filters) {
+    setFilters(nextFilters);
+    setPage(1);
+  }
+
+  function toggleCategory(category: Filters["categories"][number]) {
+    const nextCategories = filters.categories.includes(category)
+      ? filters.categories.filter((value) => value !== category)
+      : [...filters.categories, category];
+
+    updateFilters({ ...filters, categories: nextCategories });
+  }
+
   return (
     <div className="stack-lg">
       <section className="hero-panel compact">
@@ -57,25 +70,38 @@ export function RankingsTable() {
         </div>
       </section>
 
-      <section className="filter-bar">
-        <label>
-          Restaurant type
-          <select
-            value={filters.type}
-            onChange={(event) =>
-              setFilters((current) => ({
-                ...current,
-                type: event.target.value as RestaurantType | "All",
-              }))
-            }
-          >
-            <option value="All">All</option>
-            {restaurantTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
+      <section className="filter-shell">
+        <div className="filter-strip">
+          <div className="filter-strip-head">
+            <span className="eyebrow">Categories</span>
+            <button
+              className="filter-subtle"
+              onClick={() => updateFilters({ ...filters, categories: [] })}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="chip-row">
+            {restaurantCategories.map((category) => (
+              <button
+                key={category}
+                className={filters.categories.includes(category) ? "filter-chip active" : "filter-chip"}
+                onClick={() => toggleCategory(category)}
+                type="button"
+              >
+                {category}
+              </button>
             ))}
-          </select>
+          </div>
+        </div>
+
+        <section className="filter-bar">
+        <label>
+          Categories
+          <div className="filter-value">
+            {filters.categories.length === 0 ? "All categories" : `${filters.categories.length} selected`}
+          </div>
         </label>
 
         <label>
@@ -83,10 +109,10 @@ export function RankingsTable() {
           <select
             value={filters.priceTier}
             onChange={(event) =>
-              setFilters((current) => ({
-                ...current,
+              updateFilters({
+                ...filters,
                 priceTier: event.target.value as Filters["priceTier"],
-              }))
+              })
             }
           >
             <option value="All">All</option>
@@ -103,10 +129,10 @@ export function RankingsTable() {
           <select
             value={filters.radiusMiles}
             onChange={(event) =>
-              setFilters((current) => ({
-                ...current,
+              updateFilters({
+                ...filters,
                 radiusMiles: Number(event.target.value),
-              }))
+              })
             }
           >
             <option value={1}>1 mile</option>
@@ -122,10 +148,11 @@ export function RankingsTable() {
             placeholder="Try 94109, Hayes Valley, or Mission"
             value={filters.locationQuery}
             onChange={(event) =>
-              setFilters((current) => ({ ...current, locationQuery: event.target.value }))
+              updateFilters({ ...filters, locationQuery: event.target.value })
             }
           />
         </label>
+        </section>
       </section>
 
       <section className="rankings-shell">
@@ -144,7 +171,7 @@ export function RankingsTable() {
               <div>
                 <h3>{restaurant.name}</h3>
                 <p>
-                  {restaurant.type} · {restaurant.neighborhood} · {restaurant.zipCode}
+                  {restaurant.category} · {restaurant.type} · {restaurant.neighborhood} · {restaurant.zipCode}
                 </p>
               </div>
               <strong>{restaurant.elo}</strong>
