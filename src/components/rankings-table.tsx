@@ -23,7 +23,7 @@ function trendLabel(trend: number) {
 
 export function RankingsTable() {
   const [filters, setFilters] = useState<Filters>({
-    categories: defaultSelectedCategories,
+    categories: [],
     priceTier: "All",
     locationQuery: "",
     radiusMiles: 3,
@@ -73,16 +73,23 @@ export function RankingsTable() {
       <section className="filter-shell">
         <div className="filter-strip">
           <div className="filter-strip-head">
-            <span className="eyebrow">Categories</span>
-            <button
-              className="filter-subtle"
-              onClick={() =>
-                updateFilters({ ...filters, categories: defaultSelectedCategories })
-              }
-              type="button"
-            >
-              Reset
-            </button>
+            <div>
+              <span className="eyebrow">Categories</span>
+              <p className="filter-note">
+                {filters.categories.length === 0
+                  ? "Default view: restaurant categories only"
+                  : `${filters.categories.length} categories selected`}
+              </p>
+            </div>
+            <div className="filter-strip-actions">
+              <button
+                className="filter-subtle"
+                onClick={() => updateFilters({ ...filters, categories: [] })}
+                type="button"
+              >
+                Reset
+              </button>
+            </div>
           </div>
           <div className="chip-row">
             {restaurantCategories.map((category) => (

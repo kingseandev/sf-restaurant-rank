@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  defaultSelectedCategories,
   restaurants,
   type PriceTier,
   type RestaurantCategory,
@@ -207,10 +208,12 @@ function milesBetween(
 
 export function filterRestaurants(filters: Filters): Restaurant[] {
   const center = resolveLocationCenter(filters.locationQuery);
+  const effectiveCategories =
+    filters.categories.length === 0 ? defaultSelectedCategories : filters.categories;
 
   return restaurants.filter((restaurant) => {
     const categoryMatches =
-      filters.categories.length === 0 || filters.categories.includes(restaurant.category);
+      effectiveCategories.includes(restaurant.category);
     const priceMatches =
       filters.priceTier === "All" || restaurant.priceTier === filters.priceTier;
     const locationMatches =
