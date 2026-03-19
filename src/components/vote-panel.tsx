@@ -24,10 +24,22 @@ function VoteCard({
       <h3>{restaurant.name}</h3>
       <p>{restaurant.tagline}</p>
       <div className="vote-meta">
-        <span>{restaurant.type}</span>
-        <span>{restaurant.neighborhood}</span>
-        <span>{restaurant.zipCode}</span>
-        <span>{restaurant.priceTier}</span>
+        <div className="vote-meta-item">
+          <span className="vote-meta-label">Type</span>
+          <strong>{restaurant.type}</strong>
+        </div>
+        <div className="vote-meta-item">
+          <span className="vote-meta-label">Area</span>
+          <strong>{restaurant.neighborhood}</strong>
+        </div>
+        <div className="vote-meta-item">
+          <span className="vote-meta-label">ZIP</span>
+          <strong>{restaurant.zipCode}</strong>
+        </div>
+        <div className="vote-meta-item">
+          <span className="vote-meta-label">Price</span>
+          <strong>{restaurant.priceTier}</strong>
+        </div>
       </div>
     </button>
   );
