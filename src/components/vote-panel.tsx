@@ -34,6 +34,7 @@ function VoteCard({
 }
 
 export function VotePanel() {
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     categories: [],
     priceTier: "All",
@@ -87,6 +88,10 @@ export function VotePanel() {
     updateFilters({ ...filters, categories: nextCategories });
   }
 
+  const visibleCategories = categoriesExpanded
+    ? restaurantCategories
+    : Array.from(new Set([...restaurantCategories.slice(0, 6), ...filters.categories]));
+
   return (
     <div className="stack-lg">
       <section className="filter-shell">
@@ -111,7 +116,7 @@ export function VotePanel() {
             </div>
           </div>
           <div className="chip-row">
-            {restaurantCategories.map((category) => (
+            {visibleCategories.map((category) => (
               <button
                 key={category}
                 className={filters.categories.includes(category) ? "filter-chip active" : "filter-chip"}
@@ -122,6 +127,13 @@ export function VotePanel() {
               </button>
             ))}
           </div>
+          <button
+            className="filter-toggle"
+            onClick={() => setCategoriesExpanded((value) => !value)}
+            type="button"
+          >
+            {categoriesExpanded ? "Show fewer categories" : "Show more categories"}
+          </button>
         </div>
 
         <section className="filter-bar filter-bar-compact">
