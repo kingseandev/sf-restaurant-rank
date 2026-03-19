@@ -242,12 +242,21 @@ select {
   gap: 14px;
 }
 
+.vote-layout .filter-shell {
+  gap: 10px;
+}
+
 .filter-strip {
   border: 1px solid var(--line);
   border-radius: 24px;
   background: rgba(9, 19, 34, 0.8);
   padding: 16px;
   box-shadow: var(--shadow);
+}
+
+.vote-layout .filter-strip {
+  padding: 12px 14px;
+  border-radius: 20px;
 }
 
 .filter-strip-head {
@@ -258,10 +267,18 @@ select {
   margin-bottom: 12px;
 }
 
+.vote-layout .filter-strip-head {
+  margin-bottom: 8px;
+}
+
 .filter-note {
   margin: 6px 0 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.vote-layout .filter-note {
+  font-size: 0.84rem;
 }
 
 .filter-strip-actions {
@@ -286,6 +303,11 @@ select {
   gap: 10px;
 }
 
+.vote-layout .chip-row {
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 8px;
+}
+
 .filter-chip {
   min-height: 38px;
   width: 100%;
@@ -297,6 +319,11 @@ select {
   cursor: pointer;
   transition: background 160ms ease, color 160ms ease, border-color 160ms ease,
     transform 160ms ease;
+}
+
+.vote-layout .filter-chip {
+  min-height: 34px;
+  font-size: 0.9rem;
 }
 
 .filter-chip:hover,
@@ -322,6 +349,12 @@ select {
   cursor: pointer;
 }
 
+.vote-layout .filter-toggle {
+  margin-top: 8px;
+  padding-top: 6px;
+  font-size: 0.92rem;
+}
+
 .filter-bar label {
   display: grid;
   gap: 10px;
@@ -342,6 +375,22 @@ select {
   color: var(--text);
   outline: none;
   transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.vote-layout .filter-bar {
+  padding: 14px;
+  gap: 10px;
+  border-radius: 20px;
+}
+
+.vote-layout .filter-bar label {
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.vote-layout .filter-bar input,
+.vote-layout .filter-bar select {
+  min-height: 46px;
 }
 
 .filter-bar input::placeholder {
@@ -428,6 +477,17 @@ select {
   align-content: center;
   justify-items: center;
   gap: 14px;
+}
+
+.vote-prompt {
+  margin: 0;
+  max-width: 12ch;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .vote-divider {

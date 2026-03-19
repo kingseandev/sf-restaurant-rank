@@ -192,6 +192,7 @@ export function VotePanel() {
         <section className="vote-grid">
           <VoteCard restaurant={pair[0]} onSelect={handleVote} />
           <div className="vote-middle">
+            <p className="vote-prompt">Tap the restaurant that deserves the higher rank</p>
             <div className="vote-divider">OR</div>
             <button className="skip-button" onClick={handleSkip} type="button">
               Skip matchup
