@@ -59,14 +59,10 @@ export function RankingsTable() {
 
   return (
     <div className="stack-lg">
-      <section className="hero-panel compact">
+      <section className="hero-panel compact rankings-hero">
         <div>
           <span className="eyebrow">Live leaderboard</span>
-          <h1>Current San Francisco restaurant rankings</h1>
-          <p>
-            Trend indicators compare each restaurant&apos;s position against where it stood
-            seven days ago.
-          </p>
+          <h1 className="rankings-hero-title">San Francisco Restaurant Rankings</h1>
         </div>
       </section>
 
