@@ -27,6 +27,24 @@ function effectiveTypes(filters: Filters): RestaurantType[] | null {
   return null;
 }
 
+function isDefaultRestaurantCandidate(restaurant: Restaurant) {
+  const text = `${restaurant.name} ${restaurant.tagline}`.toLowerCase();
+  const excludedMarkers = [
+    "pop up",
+    "popup",
+    "truck",
+    "food truck",
+    "catering",
+    "mobile bar",
+    "fair",
+    "festival",
+    "temporary",
+    "event",
+  ];
+
+  return !excludedMarkers.some((marker) => text.includes(marker));
+}
+
 type StoredState = {
   votes: VoteRecord[];
 };
@@ -224,6 +242,8 @@ export function filterRestaurants(filters: Filters): Restaurant[] {
       filters.categories.length === 0 || filters.categories.includes(restaurant.category);
     const typeMatches =
       implicitTypes === null || implicitTypes.includes(restaurant.type);
+    const defaultCandidateMatches =
+      filters.categories.length !== 0 || isDefaultRestaurantCandidate(restaurant);
     const priceMatches =
       filters.priceTier === "All" || restaurant.priceTier === filters.priceTier;
     const locationMatches =
@@ -231,7 +251,13 @@ export function filterRestaurants(filters: Filters): Restaurant[] {
       (center !== null &&
         milesBetween(center, restaurant.coordinates) <= filters.radiusMiles);
 
-    return categoryMatches && typeMatches && priceMatches && locationMatches;
+    return (
+      categoryMatches &&
+      typeMatches &&
+      defaultCandidateMatches &&
+      priceMatches &&
+      locationMatches
+    );
   });
 }
 
